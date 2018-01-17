@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Try The React Calculator</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+  <body>
+
+    <div id="react-container"></div>
+
+    <script src="https://fb.me/react-15.0.0.js"></script>
+    <script src="https://fb.me/react-dom-15.0.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+
+    <script type="text/babel">
+
+      var page = document.querySelector("#react-container");
+
+      var CalItems = React.createClass({
+        render: function() {
+          var CalEntries = this.props.entries;
+          function calculator (string) {
+            var mathArray = [];
+            var runningTotal = 0;
+            var firstVar = 0;
+            var secondVar = 0;
+            var numArray = string.split(/[\D]/);
+            var testArray = string.split(/[\d]/);
+            var counter = 1;
+            for (var x =0; x < testArray.length; x++) {
+              if(testArray[x]) mathArray.push(testArray[x]);
+            }
+
+            for (var y = 0; y <= mathArray.length-1; y++) {
+              if(counter === 1) {
+                firstVar = parseInt(numArray[y]), secondVar = parseInt(numArray[y + 1]);
+              } else {
+                firstVar = runningTotal, secondVar = parseInt(numArray[y + 1]);
+              }
+              counter = counter + 1;
+
+              switch(mathArray[y]) {
+                case "+" :
+                  runningTotal = firstVar + secondVar;
+                  break;
+                case "-" :
+                  runningTotal = firstVar - secondVar;
+                   break;
+                case "*" :
+                  runningTotal = firstVar * secondVar;
+                   break;
+                case "/" :
+                  runningTotal = firstVar / secondVar;
+                   break;
+                default:
+                  return "Error you have used an unavaible operator";
+              }
+            }
+           return runningTotal;
+          }
+
+          function createCalTasks(item) {
+            return <li key={item.key}>{calculator (item.text)}</li>
+          }
+
+          var listItems = CalEntries.map(createCalTasks);
+
+          return (
+            <ul className="theAnswer">
+              {listItems}
+            </ul>
+          );
+        }
+      });
+      var CalList = React.createClass({
+
+        getInitialState: function() {
+          return {
+            items: [],
+            date: new Date()
+          };
+        },
+
+        addItem: function(e) {
+
+          var itemArray = this.state.items;
+
+          itemArray.push(
+            {
+          text: this.inputItem.value,
+          key: Date.now()
+        }
+      );
+
+        this.setState({
+          items: itemArray
+        });
+        this.inputItem.value = "";
+
+        e.preventDefault();
+        },
+
+        render: function() {
+          return (
+            <div className="calculatorMain">
+            <h1>Try The React Calculator</h1>
+              <div className="header">
+                <form onSubmit={this.addItem}>
+                  <input ref={(a) => this.inputItem = a}>
+                  </input>
+                  <button type="submit">Try A Calculation</button>
+
+                </form>
+              </div>
+              <h3>Your Answers:</h3>
+              <CalItems entries={this.state.items}/>
+            </div>
+          );
+        }
+      });
+
+      ReactDOM.render(
+          <div>
+            <CalList/>
+          </div>,
+          page
+        );
+    </script>
+  </body>
+</html>
